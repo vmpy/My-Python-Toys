@@ -13,7 +13,7 @@ def FindPageUrl(html):
 def OpenPage(PageList):
     
     for i in PageList:
-        OpenUrl = 'http://www.52kkm.org/riben/wuyiniao/' + i
+        OpenUrl = '**********************************' + i
         response = urllib.request.urlopen(OpenUrl)
         html = response.read().decode('gb2312','ignore')
         OpenImgine(html,False)
@@ -21,7 +21,7 @@ def OpenPage(PageList):
 
 def OpenUrl():
     #http://www.52kkm.org/riben/wuyiniao/*.html
-    OpenUrl = 'http://www.52kkm.org/riben/wuyiniao/3063.html'
+    OpenUrl = '**********************************'
     while True:
         try:
             response = urllib.request.urlopen(OpenUrl)
