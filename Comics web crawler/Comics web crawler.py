@@ -30,6 +30,9 @@ def OpenUrl():
             
         html = response.read().decode('gb2312','ignore')
         NextUrl = re.findall(r'下一篇：<a href=\'([0-9\w/_]*.html)\'>',html)
+	if not NextUrl:
+		print('下载完毕\n')
+		return 0
         OpenImgine(html,True)
         print(OpenUrl)
         PageList = FindPageUrl(html)
