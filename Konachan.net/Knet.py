@@ -8,7 +8,6 @@ import os
 
 def GetPicStyleName():
     PicStyle = str(input("请输入要在K站爬取图片的类型：\n"))
-    #HomeUrl = "https://konachan.com/post?tags=" + PicStyle
     return PicStyle
 
 def OpenHomeUrl(Url):
@@ -57,7 +56,6 @@ def CopyPic(PicResult):
 
 
 if __name__ == '__main__':
-    
     Path = "D:\\konachan\\"
     if not (os.path.exists(Path)):
         os.makedirs(Path)
