@@ -1,13 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
-import urllib.request
 import os
+import time
+import urllib.request
 
 #https://konachan.com/post?tags=data
 
 def GetPicStyleName():
     PicStyle = str(input("请输入要在K站爬取图片的类型：\n"))
+    #HomeUrl = "https://konachan.com/post?tags=" + PicStyle
     return PicStyle
 
 def OpenHomeUrl(Url):
@@ -56,6 +58,7 @@ def CopyPic(PicResult):
 
 
 if __name__ == '__main__':
+    
     Path = "D:\\konachan\\"
     if not (os.path.exists(Path)):
         os.makedirs(Path)
@@ -70,3 +73,4 @@ if __name__ == '__main__':
         Page = Page+1
         HomeUrl = 'https://konachan.com/post?' + 'page=' + str(Page) + '&tags=' + Tags
         We = OpenHomeUrl(HomeUrl)
+        time.sleep(5)
