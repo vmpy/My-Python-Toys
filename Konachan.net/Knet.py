@@ -48,9 +48,9 @@ def CopyPic(PicResult):
         if os.path.exists(FileName):
             continue
         
-        with open(FileName,'wb') as F:
-            F.write(Response.read())
-            F.close()
+        with open(FileName,'wb') as File:
+            File.write(Response.read())
+            File.close()
             count = count+1
         print("第" + str(count) + "张"+"下载完成!")
         
