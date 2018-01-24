@@ -7,6 +7,7 @@ import zlib
 
 HomeUrl = 'https://www.bilibili.com/video/av'
 ImagineName = 'Origin'
+
 def GetTarget():
     Num = input("请输入Bilibili视频Av号(请输入纯数字):\n")
     while re.match(r'[^(0-9)]+',Num):       #如果输入为非纯数字字符串
@@ -14,7 +15,9 @@ def GetTarget():
     return Num
 
 def OpenUrl(Num):
+    global ImagineName
     ImagineName = Num
+    
     Url = HomeUrl + Num
     Headers ={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Encoding':'gzip, deflate, sdch, br',
