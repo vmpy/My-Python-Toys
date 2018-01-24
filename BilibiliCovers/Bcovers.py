@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import re
 import os
-import urllib.request
 import zlib
+import urllib.request
 
 HomeUrl = 'https://www.bilibili.com/video/av'
 ImagineName = 'Origin'
@@ -18,7 +18,7 @@ def OpenUrl(Num):
     global ImagineName
     ImagineName = Num
     
-    Url = HomeUrl + Num
+    Url = HomeUrl + Num     #B站视频网站构成
     Headers ={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Encoding':'gzip, deflate, sdch, br',
                 'Accept-Language':'zh-CN,zh;q=0.8',
@@ -30,7 +30,7 @@ def OpenUrl(Num):
 
     Response = urllib.request.urlopen(Req)
     Html = Response.read()
-    Html = zlib.decompress(Html,16+zlib.MAX_WBITS).decode('utf-8')      #bilibili采用gzip压缩网页源码
+    Html = zlib.decompress(Html,16+zlib.MAX_WBITS).decode('utf-8','ignore')      #bilibili采用gzip压缩网页源码,zlib.decompress解压缩.
     return Html
 
 def SaveImagine(Html):
