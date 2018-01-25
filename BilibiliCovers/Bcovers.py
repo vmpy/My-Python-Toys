@@ -6,12 +6,19 @@ import zlib
 import urllib.request
 
 HomeUrl = 'https://www.bilibili.com/video/av'
-ImagineName = 'Origin'
+ImagineName = 'None'
 
 def GetTarget():
     Num = input("请输入Bilibili视频Av号(请输入纯数字):\n")
-    while re.match(r'[^(0-9)]+',Num):       #如果输入为非纯数字字符串
+    while re.match(r'[^(avAV0-9)]+',Num):       #如果输入为非纯数字字符串
         Num = input("输入有误,请重新输入Bilibili视频Av号(请输入纯数字):\n")
+    #当不同人喜欢在数字前加上'AV':
+    if 'a' in Num and 'v' in Num:
+        Num = Num[2:]
+    elif 'A' in Num and 'V' in Num:
+        Num = Num[2:]
+    elif 'A' in Num and 'v' in Num:
+        Num = Num[2:]
     return Num
 
 def OpenUrl(Num):
