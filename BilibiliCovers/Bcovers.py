@@ -11,19 +11,25 @@ ImagineName = 'None'
 def GetTarget():
     Num = input("请输入Bilibili视频Av号(请输入纯数字):\n")
     while re.match(r'[^(avAV0-9)]+',Num):       #如果输入为非纯数字字符串
-        Num = input("输入有误,请重新输入Bilibili视频Av号(请输入纯数字):\n")
+        Num = input("输入有误,请重新输入Bilibili视频Av号(请输入正确编码):\n")
     #当不同人喜欢在数字前加上'AV':
-    if 'a' in Num and 'v' in Num:
-        Num = Num[2:]
-    elif 'A' in Num and 'V' in Num:
-        Num = Num[2:]
-    elif 'A' in Num and 'v' in Num:
-        Num = Num[2:]
+    while(re.match(r'[AaVv]+',Num)):
+        if 'a' in Num and 'v' in Num and Num[:2] == 'av':
+            Num = Num[2:]
+            break
+        elif 'A' in Num and 'V' in Num and Num[:2] == 'AV':
+            Num = Num[2:]
+            break
+        elif 'A' in Num and 'v' in Num and Num[:2] == 'Av':
+            Num = Num[2:]
+            break
+        else:
+            Num = input("输入有误,请重新输入Bilibili视频Av号(请输入正确编码):\n")
     return Num
 
 def OpenUrl(Num):
     global ImagineName
-    ImagineName = Num
+    ImagineName = 'Av' + Num
     
     Url = HomeUrl + Num     #B站视频网站构成
     Headers ={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -41,8 +47,9 @@ def OpenUrl(Num):
     return Html
 
 def SaveImagine(Html):
-    ImagineUrl = re.findall(r'<img src="(//i[0-9]+.hdslb.com/bfs/archive/\S+.[jpg|gif|png])" style="display:none;"',Html)
-    ImagineUrl = 'http:' + ImagineUrl[0]
+    ImagineUrl = re.findall(r'<meta data-vue-meta="true" itemprop="image" content="(http://i0.hdslb.com/bfs/archive/\S+.[jpg|png|gif])"/>',Html)
+    print(Html)
+    ImagineUrl = ImagineUrl[0]
     Path = "D:\\BilibiliCovers\\"           #单独创建文件夹
     if not (os.path.exists(Path)):
         os.makedirs(Path)
