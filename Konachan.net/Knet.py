@@ -73,4 +73,4 @@ if __name__ == '__main__':
         Page = Page+1
         HomeUrl = 'https://konachan.com/post?' + 'page=' + str(Page) + '&tags=' + Tags
         We = OpenHomeUrl(HomeUrl)
-        time.sleep(5)
+        time.sleep(5)   #防止访问过频，然后GG
