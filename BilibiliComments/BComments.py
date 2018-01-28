@@ -34,6 +34,13 @@ def GetCommentData(Num):
     FilePath = "D:\\BilibiliComment\\" + 'Av' + str(Num) + '\\'
     if not (os.path.exists(FilePath)):
         os.makedirs(FilePath)
+    else:
+        Tmp = input('已存在该文件记录,是否继续？请输入[继续\\退出]:\n')
+        while Tmp != '继续' and Tmp != '退出':
+            Tmp = input("\n指令有误,请重新输入:")
+
+        if Tmp == '退出':
+            return 0
     os.chdir(FilePath)
     #评论API
     Url = 'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn='
@@ -107,7 +114,7 @@ def IsGoOn():
     while(1):
         Tmp = input("\n是否继续?(继续\退出):")
         while Tmp != '继续' and Tmp != '退出':
-            Tmp = input("\n请重新输入:")
+            Tmp = input("\n指令有误,请重新输入:")
 
         if Tmp == '继续':
             return 1
