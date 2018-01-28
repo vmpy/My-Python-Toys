@@ -95,6 +95,7 @@ def SaveNormalReplies(Comment,Page):
                 F.close()
                 
                 if(Comment['data']['replies'][Index]['floor'] == 1):
+                    print('第'+ str(Page+1) + '页' + '评论区评论爬取完毕!')
                     print('所有评论爬取完毕\n')
                     return 1
                 Index+=1
