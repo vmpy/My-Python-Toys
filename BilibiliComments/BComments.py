@@ -47,7 +47,6 @@ def GetCommentData(Num):
                 'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
     while(1):
         Url = Url + str(Page) + '&type=1&oid=' + Num + '&sort=0'
-        print(Url)
         Request = urllib.request.Request(Url,None,Headers,method = 'GET')
         Response = urllib.request.urlopen(Request)
         JsonData = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
@@ -105,9 +104,16 @@ def SaveNormalReplies(Comment,Page):
 
 def IsGoOn():
     while(1):
-        Tmp = input('是否继续' + '\n请输入[退出//继续]')
-        
+        Tmp = input("\n是否继续?(继续\退出):")
+        while Tmp != '继续' and Tmp != '退出':
+            Tmp = input("\n请重新输入:")
+
+        if Tmp == '继续':
+            return 1
+        if Tmp == '退出':
+            return 0
     
 if __name__ == '__main__':
+    GetCommentData(GetVideoNumber())
     while(IsGoOn()):
         GetCommentData(GetVideoNumber())
