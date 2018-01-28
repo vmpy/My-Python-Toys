@@ -3,6 +3,7 @@
 import os
 import json
 import zlib
+import time
 import re
 import urllib.request
 
@@ -105,6 +106,9 @@ def SaveNormalReplies(Comment,Page):
                 
                 if(Comment['data']['replies'][Index]['floor'] == 1):
                     print('第'+ str(Page+1) + '页' + '评论区评论爬取完毕!')
+                    with open(FileName,'a',encoding='utf-8') as T:
+                        T.write('爬取时间:' + (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+                        T.close()
                     print('所有评论爬取完毕\n')
                     return 1
                 Index+=1
