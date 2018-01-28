@@ -3,7 +3,6 @@
 import os
 import json
 import zlib
-import sys
 import re
 import urllib.request
 
@@ -26,13 +25,11 @@ def GetVideoNumber():
             Num = input("输入有误,请重新输入Bilibili视频Av号(请输入正确编码):\n")
     return Num
 
-def GetCommentData(Num):
-    
+def GetCommentData(Num):  
     #是否已经爬取过热评
     IsSaveHots = False
-    #评论楼层是否为1楼
-    IsFloorOne = False
-    
+
+    #创建文件夹，并将工作目录设置为该文件夹.
     FilePath = "D:\\BilibiliComment\\" + 'Av' + str(Num) + '\\'
     if not (os.path.exists(FilePath)):
         os.makedirs(FilePath)
@@ -70,10 +67,12 @@ def GetCommentData(Num):
         if(SaveNormalReplies(Comment,Page)):
             return 0
         Page += 1
+        #重置Url的值
         Url = 'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn='
     return 0
 
 def SaveHots(Comment):
+    #json数据的索引
     Index = 0
     while(1):
         try:
@@ -90,6 +89,7 @@ def SaveHots(Comment):
             return 0
 
 def SaveNormalReplies(Comment,Page):
+    #json数据的索引
     Index = 0
     while(1):
         try:
@@ -108,6 +108,7 @@ def SaveNormalReplies(Comment,Page):
                     print('所有评论爬取完毕\n')
                     return 1
                 Index+=1
+        #当Index超出时，说明爬取完毕.
         except IndexError:
             print('第'+ str(Page) + '页' + '评论区评论爬取完毕!')
             return 0
