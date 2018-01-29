@@ -70,6 +70,7 @@ def GetCommentData(Num):
         Page += 1
         #重置Url的值
         Url = 'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn='
+        time.sleep(1)       #防止访问过频，然后GG
     return 0
 
 def SaveHots(Comment):
@@ -101,20 +102,45 @@ def SaveNormalReplies(Comment,Page):
                 F.write(Comment['data']['replies'][Index]['member']['uname'])
                 F.write(':\n')
                 F.write(Comment['data']['replies'][Index]['content']['message'])
-                F.write('\n\n')
+                F.write('\n')
                 F.close()
+                SaveNormalRepliesReplies(Comment,Index)
+                with open(FileName,'a',encoding='utf-8') as E:
+                    E.write('\n')
+                    E.close()
                 
                 if(Comment['data']['replies'][Index]['floor'] == 1):
-                    print('第'+ str(Page+1) + '页' + '评论区评论爬取完毕!')
+                    print('第'+ str(Page) + '页' + '评论区评论爬取完毕!')
                     with open(FileName,'a',encoding='utf-8') as T:
                         T.write('爬取时间:' + (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
                         T.close()
                     print('所有评论爬取完毕\n')
                     return 1
                 Index+=1
-        #当Index超出时，说明爬取完毕.
+        #当Index超出字典索引范围时，说明爬取完毕.
         except IndexError:
             print('第'+ str(Page) + '页' + '评论区评论爬取完毕!')
+            return 0
+
+#爬取评论楼中楼.
+def SaveNormalRepliesReplies(Comment,Index):
+    #json数据的索引
+    IndexOfFloor = 0
+    while(1):
+        try:
+            FileName = '评论区评论.txt'
+            #Python的编码真是一个大坑……
+            with open(FileName,'a',encoding='utf-8') as F:
+                F.write('\t回复:' + Comment['data']['replies'][Index]['replies'][IndexOfFloor]['member']['uname'])
+                F.write(':' + Comment['data']['replies'][Index]['replies'][IndexOfFloor]['content']['message'] + '\n')
+                F.close()
+                IndexOfFloor+=1
+                
+        #当IndexOfFloor超出字典索引范围时，说明楼中楼爬取完毕.
+        except IndexError:
+            with open(FileName,'a',encoding='utf-8') as Fe:
+                Fe.write('\n')
+                Fe.close()
             return 0
 
 def IsGoOn():
