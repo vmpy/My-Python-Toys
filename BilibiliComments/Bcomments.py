@@ -65,7 +65,7 @@ def GetCommentData(Num):
             SaveHots(Comment)
             IsSaveHots = True
 
-        if(SaveNormalReplies(Comment,Page)):
+        if(SaveNormalReplies(Comment,Page,Num)):
             return 0
         Page += 1
         #重置Url的值
@@ -90,7 +90,7 @@ def SaveHots(Comment):
             print('热评爬取完毕!')
             return 0
 
-def SaveNormalReplies(Comment,Page):
+def SaveNormalReplies(Comment,Page,Num):
     #json数据的索引
     Index = 0
     while(1):
@@ -104,7 +104,7 @@ def SaveNormalReplies(Comment,Page):
                 F.write(Comment['data']['replies'][Index]['content']['message'])
                 F.write('\n')
                 F.close()
-                SaveNormalRepliesReplies(Comment,Index)
+                SaveNormalRepliesReplies(Comment,Index,Num)
                 with open(FileName,'a',encoding='utf-8') as E:
                     E.write('\n')
                     E.close()
@@ -122,26 +122,47 @@ def SaveNormalReplies(Comment,Page):
             print('第'+ str(Page) + '页' + '评论区评论爬取完毕!')
             return 0
 
-#爬取评论楼中楼.
-def SaveNormalRepliesReplies(Comment,Index):
-    #json数据的索引
-    IndexOfFloor = 0
+def SaveNormalRepliesReplies(Comment,Index,Num):
+    #楼中楼评论页数.
+    PageNum = 1
+    #楼中楼评论API.
     while(1):
-        try:
-            FileName = '评论区评论.txt'
-            #Python的编码真是一个大坑……
-            with open(FileName,'a',encoding='utf-8') as F:
-                F.write('\t回复:' + Comment['data']['replies'][Index]['replies'][IndexOfFloor]['member']['uname'])
-                F.write(':' + Comment['data']['replies'][Index]['replies'][IndexOfFloor]['content']['message'] + '\n')
-                F.close()
-                IndexOfFloor+=1
-                
-        #当IndexOfFloor超出字典索引范围时，说明楼中楼爬取完毕.
-        except IndexError:
-            with open(FileName,'a',encoding='utf-8') as Fe:
-                Fe.write('\n')
-                Fe.close()
-            return 0
+        FloorURL = 'https://api.bilibili.com/x/v2/reply/reply?jsonp=jsonp&pn=' + str(PageNum) + '&type=1&oid=' + Num + '&ps=10&root=' + str(Comment['data']['replies'][Index]['rpid'])
+
+        Headers = { 'Accept':'*/*',
+                'Accept-Encoding':'gzip, deflate, sdch, br',
+                'Accept-Language':'zh-CN,zh;q=0.8',
+                'Connection':'keep-alive',
+                'Host':'api.bilibili.com',
+                'Referer':'https://www.bilibili.com/video/av859194/',
+                'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
+        Request = urllib.request.Request(FloorURL,None,Headers,method = 'GET')
+        Response = urllib.request.urlopen(Request)
+        JsonData = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
+
+        CommentFloor = json.loads(JsonData)
+        #Json数据的索引.
+        IndexOfFloor = 0
+        while(1):
+            try:
+                FileName = '评论区评论.txt'
+                with open(FileName,'a',encoding='utf-8') as F:
+                    F.write('\t回复:\t' + CommentFloor['data']['replies'][IndexOfFloor]['member']['uname'] + ':' + CommentFloor['data']['replies'][IndexOfFloor]['content']['message'] + '\n')
+                    F.close()
+                    IndexOfFloor+=1
+                    
+            #当IndexOfFloor超出字典索引范围时，说明单页楼中楼爬取完毕.
+            except IndexError:
+                with open(FileName,'a',encoding='utf-8') as Fe:
+                    Fe.write('\n')
+                    Fe.close()
+                #B站的楼中楼单页为9条，所以当IndexOfFloor递增最后的值为小于10时，说明已经到了末页.
+                if IndexOfFloor < 10:
+                    return 0
+                break
+        PageNum += 1
+
+    return 0
 
 def IsGoOn():
     while(1):
