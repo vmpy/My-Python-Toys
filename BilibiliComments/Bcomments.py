@@ -42,8 +42,7 @@ def GetCommentData(Num):
         if Tmp == '退出':
             return 0
     os.chdir(FilePath)
-    #评论API
-    Url = 'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn='
+    
     Page = 1
     Headers = { 'Accept':'*/*',
                 'Accept-Encoding':'gzip, deflate, sdch, br',
@@ -53,7 +52,7 @@ def GetCommentData(Num):
                 'Referer':'https://www.bilibili.com/video/av14650141/',
                 'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
     while(1):
-        Url = Url + str(Page) + '&type=1&oid=' + Num + '&sort=0'
+        Url = 'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=' + str(Page) + '&type=1&oid=' + Num + '&sort=0'
         Request = urllib.request.Request(Url,None,Headers,method = 'GET')
         Response = urllib.request.urlopen(Request)
         JsonData = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
@@ -68,8 +67,6 @@ def GetCommentData(Num):
         if(SaveNormalReplies(Comment,Page,Num)):
             return 0
         Page += 1
-        #重置Url的值
-        Url = 'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn='
         time.sleep(1)       #防止访问过频，然后GG
     return 0
 
@@ -125,20 +122,26 @@ def SaveNormalReplies(Comment,Page,Num):
 def SaveNormalRepliesReplies(Comment,Index,Num):
     #楼中楼评论页数.
     PageNum = 1
+    Referer = 'https://www.bilibili.com/video/' + 'av' + Num + '/'
     #楼中楼评论API.
     while(1):
         FloorURL = 'https://api.bilibili.com/x/v2/reply/reply?jsonp=jsonp&pn=' + str(PageNum) + '&type=1&oid=' + Num + '&ps=10&root=' + str(Comment['data']['replies'][Index]['rpid'])
-
         Headers = { 'Accept':'*/*',
                 'Accept-Encoding':'gzip, deflate, sdch, br',
                 'Accept-Language':'zh-CN,zh;q=0.8',
                 'Connection':'keep-alive',
                 'Host':'api.bilibili.com',
-                'Referer':'https://www.bilibili.com/video/av859194/',
+                'Referer':Referer,
                 'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
+        
         Request = urllib.request.Request(FloorURL,None,Headers,method = 'GET')
         Response = urllib.request.urlopen(Request)
-        JsonData = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
+        try:
+            JsonData = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
+        #不知道为什么会出现zlib.error的错误,有时去GET某个API返回的数据时，print(Request.read())为b''
+        except zlib.error:
+            return 0
+            #JsonData = Response.read().decode('utf-8')
 
         CommentFloor = json.loads(JsonData)
         #Json数据的索引.
