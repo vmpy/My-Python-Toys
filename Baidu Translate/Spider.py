@@ -1,57 +1,63 @@
-# -*- coding: <utf-8> -*-
+
 import urllib.request
 import urllib.parse
-import re
+import json
+import zlib
 
+UrlAPI = 'http://fanyi.baidu.com/v2transapi'
 
-url = 'http://fanyi.baidu.com/v2transapi'
-while True:
-        while True:
-                choice = str(input("请输入转换模式:(English-中文:EN)(中文-English:ZH)(退出程序:Q!)"))
-                if choice == 'EN':
-                        break;
-                elif choice == 'ZH':
-                        break;
-                elif choice == 'Q!':
-                        quit();
-                
+Headers = {'Accept':'*/*',
+        'Accept-Encoding':'gzip, deflate',
+        'Accept-Language':'zh-CN,zh;q=0.8',
+        'Connection':'keep-alive',
+        'Content-Length':'135',
+        'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',
+        'Host':'fanyi.baidu.com',
+        'Origin':'http://fanyi.baidu.com',
+        'Referer':'http://fanyi.baidu.com/?aldtype=16047',
+        'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+        'X-Requested-With':'XMLHttpRequest'}
 
-        while True:
-                
-            enter = str(input("请输入你要翻译的词句:（输入N!退出）"))
-            data = dict()
-            if enter != 'N!':
-                head = dict()
-                head['User-Agent'] = 'User-Agent:Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36'
-                if choice == 'EN':
-                        data['from'] = 'en'
-                        data['to'] = 'zh'
-                else:
-                        data['from'] = 'zh'
-                        data['to'] = 'en'
-                data['query'] = enter
-                data['transtype'] = 'translang'
-                data['simple_means_flag'] = '3'
+def MakeChoice():
+        Tmp = int(input('请输入翻译方式:\n1.中文-英文\n2.英文-中文\n\n'))
+        while(Tmp != 1 and Tmp != 2):
+                Tmp = int(input('请重新输入翻译方式:\n1.中文-英文\n2.英文-中文\n\n'))
 
-                data = urllib.parse.urlencode(data).encode('utf-8')
-                example = urllib.request.Request(url,data,head)
-                response = urllib.request.urlopen(example)
+        return Tmp
 
-                html = response.read().decode('unicode_escape')
-                if choice == 'ZH':
-                        result = re.search(r'\"dst\":\"[\w\s0-9\+\-\*/\',\.\{\}\[\]\~\(\)\^\|=\&%\$#!]+\"',html)
-                        if result == None:
-                                break;
-                        answer = result.group()
-                else:
-                        result = re.search(r'\"dst\":\"[\S\s0-9\{\}\[\]\+\-\*\~\(\)\^\|=\&%\$#!/,]+\",',html)
-                        if result == None:
-                                break;
-                        answer = result.group()
-                        index = answer.find(',')
-                if choice == 'EN' and result:
-                        print("你所输入百度翻译结果为:" + answer[6:index])
-                elif choice == 'ZH' and result:
-                        print("你所输入百度翻译结果为:" + answer[6:])
-            else:
-                break;
+def MakeData(Way):
+        if(Way == 1):
+                data = {'from':'zh',
+                'to':'en',
+                'transtype':'translang',
+                'simple_means_flag':'3',
+                'sign':'375435.88506',
+                'token':'a67933e6193cd61cf3d18cd39bb9b10e'}
+        else:
+                data = {'from':'en',
+                'to':'zh',
+                'transtype':'translang',
+                'simple_means_flag':'3',
+                'sign':'375435.88506',
+                'token':'a67933e6193cd61cf3d18cd39bb9b10e'}
+
+        query = input('请输入要翻译的原文:\n')
+        data['query'] = query
+
+        data = urllib.parse.urlencode(data).encode('utf-8')
+
+        return data
+
+def GetJsonData(data):
+        Request = urllib.request.Request(UrlAPI,data,Headers,method = 'POST')
+        Response = urllib.request.urlopen(Request)
+        JsonData = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
+        JsonData = json.loads(JsonData)
+        return JsonData
+
+def GetResult(JsonData):
+        print('翻译结果为:' + str(JsonData['trans_result']['data'][0]['dst']))
+
+if __name__ == '__main__':
+        GetResult(GetJsonData(MakeData(MakeChoice())))
+        
