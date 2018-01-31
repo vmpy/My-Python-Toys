@@ -1,4 +1,4 @@
-
+#此程序因为Baidu翻译的反爬虫机制而不可用...
 import urllib.request
 import urllib.parse
 import json
@@ -27,14 +27,14 @@ def MakeChoice():
 
 def MakeData(Way):
         if(Way == 1):
-                data = {'from':'zh',
+                Data = {'from':'zh',
                 'to':'en',
                 'transtype':'translang',
                 'simple_means_flag':'3',
                 'sign':'375435.88506',
                 'token':'a67933e6193cd61cf3d18cd39bb9b10e'}
         else:
-                data = {'from':'en',
+                Data = {'from':'en',
                 'to':'zh',
                 'transtype':'translang',
                 'simple_means_flag':'3',
@@ -42,14 +42,14 @@ def MakeData(Way):
                 'token':'a67933e6193cd61cf3d18cd39bb9b10e'}
 
         query = input('请输入要翻译的原文:\n')
-        data['query'] = query
+        Data['query'] = query
 
-        data = urllib.parse.urlencode(data).encode('utf-8')
+        Data = urllib.parse.urlencode(Data).encode('utf-8')
 
-        return data
+        return Data
 
-def GetJsonData(data):
-        Request = urllib.request.Request(UrlAPI,data,Headers,method = 'POST')
+def GetJsonData(Data):
+        Request = urllib.request.Request(UrlAPI,Data,Headers,method = 'POST')
         Response = urllib.request.urlopen(Request)
         JsonData = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
         JsonData = json.loads(JsonData)
@@ -60,4 +60,3 @@ def GetResult(JsonData):
 
 if __name__ == '__main__':
         GetResult(GetJsonData(MakeData(MakeChoice())))
-        
