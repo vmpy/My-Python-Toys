@@ -97,7 +97,7 @@ if __name__ == '__main__':
         We = OpenHomeUrl(HomeUrl)
         #写入爬取K站的页面的页数
         with open('Page.dat','wb') as T:
-            SomeThing = str(Page)
+            SomeThing = (str(Page)).encode('utf-8')
             T.write(SomeThing)
             T.close()
         
