@@ -3,16 +3,15 @@ import os
 import zlib
 import urllib.request
 
-MaxPage = 0
-FileNameAll = str()
+MaxPage = int() #获取最大页数的全局变量.
+FileNameAll = str() #全局变量文件名字.
 
 def GetTarget():
     Tmp = input("请输入要爬取的帖子序号:\n")
-
     return ('http://bbs.tianya.cn/post-free-' + Tmp)
 
 def OpenUrlAndReturnText(Url):
-    
+    #喜闻乐见的Headers
     Headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Encoding':'gzip, deflate, sdch',
                 'Accept-Language':'zh-CN,zh;q=0.8',
@@ -54,9 +53,9 @@ def AnalyTextAndWirteFile(Html,N):
     
     #用正则找到所有关于帖子回复的源码内容:
     #我终于认识到了?非贪婪限定符的重要性:
-    RepliesUser = re.findall(r'js_username="(\S+)"',Html)
-    RepliesUserTime = re.findall(r'js_resTime="([0-9\-]+ [0-9:]+)">',Html)
-    RepliesContent = re.findall(r'<div class="bbs-content">([\s\S]+?)</div>',Html)
+    RepliesUser = re.findall(r'js_username="(\S+)"',Html)   #回复用户列表
+    RepliesUserTime = re.findall(r'js_resTime="([0-9\-]+ [0-9:]+)">',Html)  #回复用户时间列表
+    RepliesContent = re.findall(r'<div class="bbs-content">([\s\S]+?)</div>',Html)  #回复内容列表
 
     Index = 0
     with open(FileNameAll,'a',encoding = 'utf-8') as File:
@@ -83,7 +82,7 @@ def IsGoOn():
         if Tmp == '退出':
             return 0
 
-
+            
 if __name__ == '__main__':
     while(IsGoOn())
         HomeUrl = GetTarget()
@@ -100,5 +99,6 @@ if __name__ == '__main__':
             Page += 1
 
         print('全帖爬取完毕')
+    #删除俩全局变量.
     del MaxPage
     del FileNameAll
