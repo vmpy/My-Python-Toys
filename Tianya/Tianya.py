@@ -3,6 +3,8 @@ import os
 import zlib
 import urllib.request
 
+MaxPage = 0
+
 def GetTarget():
     Tmp = input("请输入要爬取的帖子序号:\n")
 
@@ -27,24 +29,27 @@ def OpenUrlAndReturnText(Url):
 
     return Html
 
-def AnalyTextAndWirteFile(Html):
+def AnalyTextAndWirteFile(Html,N):
+    global MaxPage
     #创建工作目录
     FilePath = "D:\\TianyaText\\"
     if not (os.path.exists(FilePath)):
         os.makedirs(FilePath)
 
     os.chdir(FilePath)
-    FileName = re.findall(r'<title>(\S+)</title>',Html)[0] + '.txt'
+    if N:
+        FileName = re.findall(r'<title>(\S+)</title>',Html)[0] + '.txt'
 
-    with open(FileName,'a',encoding = 'utf-8') as File:
-        Content = re.findall(r'<div class="atl-con-bd clearfix">[\s\S]+<div class="bbs-content clearfix">([\S\s]+)</div>[\s\S]+<div id="alt_action" class="clearfix">[\s\S]+</div>',Html)[0]
-        Content = Content.replace('<br>','\n')
-        Content = Content.replace('\t',' ')
-        Content = Content.replace(' ','')
-        Content = Content.replace('　','')
-        File.write('帖子正文:\n\n' + Content + '\n帖子回复:\n')
-        File.close()
-
+        with open(FileName,'a',encoding = 'utf-8') as File:
+            Content = re.findall(r'<div class="atl-con-bd clearfix">[\s\S]+<div class="bbs-content clearfix">([\S\s]+)</div>[\s\S]+<div id="alt_action" class="clearfix">[\s\S]+</div>',Html)[0]
+            Content = Content.replace('<br>','\n')
+            Content = Content.replace('\t',' ')
+            Content = Content.replace(' ','')
+            Content = Content.replace('　','')
+            File.write('帖子正文:\n\n' + Content + '\n帖子回复:\n')
+            File.close()
+        MaxPage = str(re.findall(r'…\s<a href="/post-free-[0-9\-]+.shtml">(\S+?)</a>',Html)[0])
+    
     #用正则找到所有关于帖子回复的源码内容:
     #我终于认识到了?非贪婪限定符的重要性:
     RepliesUser = re.findall(r'js_username="(\S+)"',Html)
@@ -67,4 +72,4 @@ def AnalyTextAndWirteFile(Html):
 
 if __name__ == '__main__':
     Url = GetTarget() + '-1.shtml'
-    AnalyTextAndWirteFile(OpenUrlAndReturnText(Url))
+    AnalyTextAndWirteFile(OpenUrlAndReturnText(Url),True)
