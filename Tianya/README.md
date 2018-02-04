@@ -3,4 +3,4 @@
 ## 注意事项
 
 ## 更新日志 
-2018.2.4：完成天涯杂谈面板的爬取的实现.
+2018.2.4：完成天涯杂谈面板的爬取的[实现](https://github.com/vmpy/Toy-Spiders/blob/master/Tianya/TianyaZatan.py).
