@@ -41,9 +41,29 @@ def AnalyTextAndWirteFile(Html):
         Content = Content.replace('<br>','\n')
         Content = Content.replace('\t',' ')
         Content = Content.replace(' ','')
-        File.write('帖子正文:\n\n'Content)
+        Content = Content.replace('　','')
+        File.write('帖子正文:\n\n' + Content + '\n帖子回复:\n')
         File.close()
 
+    #用正则找到所有关于帖子回复的源码内容:
+    #我终于认识到了?非贪婪限定符的重要性:
+    RepliesUser = re.findall(r'js_username="(\S+)"',Html)
+    RepliesUserTime = re.findall(r'js_resTime="([0-9\-]+ [0-9:]+)">',Html)
+    RepliesContent = re.findall(r'<div class="bbs-content">([\s\S]+?)</div>',Html)
+
+    Index = 0
+    with open(FileName,'a',encoding = 'utf-8') as File:
+        while(Index < len(RepliesUser)):
+            File.write("第"+str(Index + 1)+"楼:\n")
+            File.write(RepliesUser[Index] + ':\n')
+            File.write(RepliesUserTime[Index] + '\n')
+            File.write(RepliesContent[Index].replace(' ','').replace('\t',' ').replace('<br>','\n').replace('　',''))
+            File.write('\n')
+            Index += 1
+
+        File.close()
+
+    return 0
 
 if __name__ == '__main__':
     Url = GetTarget() + '-1.shtml'
