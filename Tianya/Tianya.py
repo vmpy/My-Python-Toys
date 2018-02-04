@@ -4,6 +4,7 @@ import zlib
 import urllib.request
 
 MaxPage = 0
+FileNameAll = str()
 
 def GetTarget():
     Tmp = input("请输入要爬取的帖子序号:\n")
@@ -31,6 +32,7 @@ def OpenUrlAndReturnText(Url):
 
 def AnalyTextAndWirteFile(Html,N):
     global MaxPage
+    global FileNameAll
     #创建工作目录
     FilePath = "D:\\TianyaText\\"
     if not (os.path.exists(FilePath)):
@@ -38,7 +40,7 @@ def AnalyTextAndWirteFile(Html,N):
 
     os.chdir(FilePath)
     if N:
-        FileName = re.findall(r'<title>(\S+)</title>',Html)[0] + '.txt'
+        FileNameAll = FileName = re.findall(r'<title>(\S+)</title>',Html)[0] + '.txt'
 
         with open(FileName,'a',encoding = 'utf-8') as File:
             Content = re.findall(r'<div class="atl-con-bd clearfix">[\s\S]+<div class="bbs-content clearfix">([\S\s]+)</div>[\s\S]+<div id="alt_action" class="clearfix">[\s\S]+</div>',Html)[0]
@@ -48,7 +50,7 @@ def AnalyTextAndWirteFile(Html,N):
             Content = Content.replace('　','')
             File.write('帖子正文:\n\n' + Content + '\n帖子回复:\n')
             File.close()
-        MaxPage = str(re.findall(r'…\s<a href="/post-free-[0-9\-]+.shtml">(\S+?)</a>',Html)[0])
+        MaxPage = int(re.findall(r'…\s<a href="/post-free-[0-9\-]+.shtml">(\S+?)</a>',Html)[0])
     
     #用正则找到所有关于帖子回复的源码内容:
     #我终于认识到了?非贪婪限定符的重要性:
@@ -57,7 +59,7 @@ def AnalyTextAndWirteFile(Html,N):
     RepliesContent = re.findall(r'<div class="bbs-content">([\s\S]+?)</div>',Html)
 
     Index = 0
-    with open(FileName,'a',encoding = 'utf-8') as File:
+    with open(FileNameAll,'a',encoding = 'utf-8') as File:
         while(Index < len(RepliesUser)):
             File.write("第"+str(Index + 1)+"楼:\n")
             File.write(RepliesUser[Index] + ':\n')
@@ -71,5 +73,19 @@ def AnalyTextAndWirteFile(Html,N):
     return 0
 
 if __name__ == '__main__':
-    Url = GetTarget() + '-1.shtml'
+    HomeUrl = GetTarget()
+    Url = HomeUrl + '-1.shtml'
     AnalyTextAndWirteFile(OpenUrlAndReturnText(Url),True)
+    print('第1页爬取完毕')
+
+    Page = 2
+    while(Page <= MaxPage):
+        Url = HomeUrl + '-' + str(Page) + '.shtml'
+        AnalyTextAndWirteFile(OpenUrlAndReturnText(Url),False)
+        print('第' + str(Page) + '页爬取完毕')
+        Page += 1
+
+    print('全帖爬取完毕')
+    del MaxPage
+    del FileNameAll
+    
