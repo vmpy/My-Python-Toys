@@ -38,7 +38,10 @@ def AnalyTextAndWirteFile(Html):
 
     with open(FileName,'a',encoding = 'utf-8') as File:
         Content = re.findall(r'<div class="atl-con-bd clearfix">[\s\S]+<div class="bbs-content clearfix">([\S\s]+)</div>[\s\S]+<div id="alt_action" class="clearfix">[\s\S]+</div>',Html)[0]
-        File.write(Content)
+        Content = Content.replace('<br>','\n')
+        Content = Content.replace('\t',' ')
+        Content = Content.replace(' ','')
+        File.write('帖子正文:\n\n'Content)
         File.close()
 
 
