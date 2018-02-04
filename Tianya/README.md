@@ -1,4 +1,6 @@
 # 天涯帖子爬虫
+[First](https://img.shields.io/travis/USER/REPO.svg)
+
   仅作为学习交流使用.
 ## 注意事项
   爬虫按照帖子ID进行爬取: 
