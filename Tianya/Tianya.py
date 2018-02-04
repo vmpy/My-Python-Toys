@@ -23,7 +23,7 @@ def OpenUrlAndReturnText(Url):
     Request = urllib.request.Request(Url,None,Headers,method = 'GET')
     Response = urllib.request.urlopen(Request)
     
-    Html = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
+    Html = Response.read().decode('utf-8')
 
     return Html
 
@@ -34,11 +34,10 @@ def AnalyTextAndWirteFile(Html):
         os.makedirs(FilePath)
 
     os.chdir(FilePath)
+    FileName = re.findall(r'<title>(\S+)</title>',Html)[0] + '.txt'
 
-    FileName = re.findall(r'<title>(\S+)_天涯杂谈_论坛_天涯社区</title>',Html)[0]
-
-    with open(FileName,'wb',encoding = 'utf-8') as File:
-        Content = re.findall(r'<div class="bbs-content clearfix">(\S+)</div>',Html)[0]
+    with open(FileName,'a',encoding = 'utf-8') as File:
+        Content = re.findall(r'<div class="atl-con-bd clearfix">[\s\S]+<div class="bbs-content clearfix">([\S\s]+)</div>[\s\S]+<div id="alt_action" class="clearfix">[\s\S]+</div>',Html)[0]
         File.write(Content)
         File.close()
 
