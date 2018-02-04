@@ -72,20 +72,33 @@ def AnalyTextAndWirteFile(Html,N):
 
     return 0
 
+def IsGoOn():
+    while(1):
+        Tmp = input("\n是否继续?(继续\退出):")
+        while Tmp != '继续' and Tmp != '退出':
+            Tmp = input("\n指令有误,请重新输入:")
+
+        if Tmp == '继续':
+            return 1
+        if Tmp == '退出':
+            return 0
+
+
 if __name__ == '__main__':
-    HomeUrl = GetTarget()
-    Url = HomeUrl + '-1.shtml'
-    AnalyTextAndWirteFile(OpenUrlAndReturnText(Url),True)
-    print('第1页爬取完毕')
+    while(IsGoOn())
+        HomeUrl = GetTarget()
+        Url = HomeUrl + '-1.shtml'
+        AnalyTextAndWirteFile(OpenUrlAndReturnText(Url),True)
+        print('第1页爬取完毕')
 
-    Page = 2
-    while(Page <= MaxPage):
-        Url = HomeUrl + '-' + str(Page) + '.shtml'
-        AnalyTextAndWirteFile(OpenUrlAndReturnText(Url),False)
-        print('第' + str(Page) + '页爬取完毕')
-        Page += 1
 
-    print('全帖爬取完毕')
+        Page = 2
+        while(Page <= MaxPage):
+            Url = HomeUrl + '-' + str(Page) + '.shtml'
+            AnalyTextAndWirteFile(OpenUrlAndReturnText(Url),False)
+            print('第' + str(Page) + '页爬取完毕')
+            Page += 1
+
+        print('全帖爬取完毕')
     del MaxPage
     del FileNameAll
-    
