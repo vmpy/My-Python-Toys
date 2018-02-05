@@ -47,9 +47,8 @@ def OpenUrl(Num):
     return Html
 
 def SaveImagine(Html):
-    ImagineUrl = re.findall(r'<meta data-vue-meta="true" itemprop="image" content="(http://i0.hdslb.com/bfs/archive/\S+.[jpg|png|gif])"/>',Html)
-    print(Html)
-    ImagineUrl = ImagineUrl[0]
+    ImagineUrl = re.findall(r'<img src="(//i[0-9].hdslb.com/bfs/archive/\S+.[a-z]+)" style="display:none;" class="cover_image"/>',Html)
+    ImagineUrl = 'http:' + ImagineUrl[0]
     Path = "D:\\BilibiliCovers\\"           #单独创建文件夹
     if not (os.path.exists(Path)):
         os.makedirs(Path)
