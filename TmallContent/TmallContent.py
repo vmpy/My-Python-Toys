@@ -21,11 +21,13 @@ class TmallSpider:
         return 0
     
     def ExtrackrInformation(self):
+        #获取链接中的关键信息:itemId,sellerId
         self.itemId = re.findall(r'id=([0-9]+)',self.Url)[0]
         self.sellerId = re.findall(r'user_id=([0-9]+)',self.Url)[0]
         return 0
     
     def GetContentData(self,Page):
+        #Target为临时变量，储存目标链接.
         TargetUrl = 'https://rate.tmall.com/list_detail_rate.htm?itemId=' + self.itemId + '&sellerId=' + self.sellerId + '&currentPage=' + str(Page)
         self.Headers['path'] = '/list_detail_rate.htm?itemId=' + self.itemId + '&sellerId=' + self.sellerId + '&currentPage=' + str(Page)
         
