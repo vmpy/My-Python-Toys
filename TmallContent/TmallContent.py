@@ -1,6 +1,8 @@
 import re
+import os
 import json
 import zlib
+import time
 import urllib.request
 
 class TmallSpider:
@@ -16,12 +18,13 @@ class TmallSpider:
 
     def GetUrl(self):
         self.Url = input('请输入天猫商品链接:\n')
-        #https://detail.tmall.com/item.htm?spm=a220m.1000858.1000725.1.175488665jKz7d&id=35685793847&skuId=3668976687307&user_id=1713424658&cat_id=2&is_b=1&rn=3a6f4b745891b9b2e6bbd62c62aa6b13
-        #https://rate.tmall.com/list_detail_rate.htm?itemId=35685793847&sellerId=1713424658&currentPage=1&append=0&content=1
+        return 0
+    
     def ExtrackrInformation(self):
         self.itemId = re.findall(r'id=([0-9]+)',self.Url)[0]
         self.sellerId = re.findall(r'user_id=([0-9]+)',self.Url)[0]
-
+        return 0
+    
     def GetContentData(self,Page):
         TargetUrl = 'https://rate.tmall.com/list_detail_rate.htm?itemId=' + self.itemId + '&sellerId=' + self.sellerId + '&currentPage=' + str(Page)
         self.Headers['path'] = '/list_detail_rate.htm?itemId=' + self.itemId + '&sellerId=' + self.sellerId + '&currentPage=' + str(Page)
@@ -29,9 +32,8 @@ class TmallSpider:
         Request = urllib.request.Request(TargetUrl,None,self.Headers,method = 'GET')
         Response = urllib.request.urlopen(Request)
         Response = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('GBK')
-
         #获取最后一页.
-        self.LastPage = re.findall(r'"lastPage":([0-9]+)',Response)
+        self.LastPage = int(re.findall(r'"lastPage":([0-9]+)',Response)[0])
         #方括号内才是格式正确的json数据.
         Response = re.findall(r'"rateList":(\[[\S\s]+\]),"searchinfo":"","tags":""}',Response)[0]
         self.JsonData = json.loads(Response)
@@ -39,8 +41,8 @@ class TmallSpider:
 
     def WriteFile(self):
         FileName = "D:\\TmallContent\\" + str(self.itemId) + '\\'
-        if not (os.path.exists(FilePath)):
-        os.makedirs(FilePath)
+        if not (os.path.exists(FileName)):
+            os.makedirs(FileName)
         else:
             Tmp = input('已存在该文件记录,是否继续？请输入[继续\\退出]:\n')
             while Tmp != '继续' and Tmp != '退出':
@@ -48,7 +50,7 @@ class TmallSpider:
 
             if Tmp == '退出':
                 return 0
-        os.chdir(FilePath)
+        os.chdir(FileName)
 
         
         Index = 0
@@ -72,8 +74,11 @@ if __name__ == '__main__':
     Instance.GetUrl()
     Instance.ExtrackrInformation()
     LastPage = Instance.GetContentData(1)
-    print("第一页爬取完毕")
+    Instance.WriteFile
+    print("第1页爬取完毕")
     Page = 2
     while(LastPage >= Page):
         Instance.GetContentData(Page)
         print("第"+str(Page)+"页爬取完毕")
+        Page += 1
+        time.sleep(3)
