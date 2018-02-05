@@ -34,13 +34,46 @@ class TmallSpider:
         self.LastPage = re.findall(r'"lastPage":([0-9]+)',Response)
         #方括号内才是格式正确的json数据.
         Response = re.findall(r'"rateList":(\[[\S\s]+\]),"searchinfo":"","tags":""}',Response)[0]
-        JsonData = json.loads(Response)
+        self.JsonData = json.loads(Response)
+        return self.LastPage
 
+    def WriteFile(self):
+        FileName = "D:\\TmallContent\\" + str(self.itemId) + '\\'
+        if not (os.path.exists(FilePath)):
+        os.makedirs(FilePath)
+        else:
+            Tmp = input('已存在该文件记录,是否继续？请输入[继续\\退出]:\n')
+            while Tmp != '继续' and Tmp != '退出':
+                Tmp = input("\n指令有误,请重新输入:")
 
+            if Tmp == '退出':
+                return 0
+        os.chdir(FilePath)
+
+        
+        Index = 0
+        with open(str(self.itemId) + '.txt','a',encoding = 'utf-8') as File:
+            try:
+                File.write("用户:" + self.JsonData[Index]['displayUserNick'] + ':\n')
+                File.write("商品型号:" + self.JsonData[Index]['auctionSku'] + '\n')
+                File.write("评论:" + self.JsonData[Index]['rateContent'] + '\n')
+                File.write("评论日期:" + self.JsonData[Index]['rateDate'] + '\n')
+                File.write("卖家回复:" + self.JsonData[Index]['reply'] + '\n\n')
+                File.close()
+                Index += 1
+            except IndexError:
+                return 0 
+
+        return 0
 
 if __name__ == '__main__':
     Instance = TmallSpider()
 
     Instance.GetUrl()
     Instance.ExtrackrInformation()
-    Instance.GetContentData(1)
+    LastPage = Instance.GetContentData(1)
+    print("第一页爬取完毕")
+    Page = 2
+    while(LastPage >= Page):
+        Instance.GetContentData(Page)
+        print("第"+str(Page)+"页爬取完毕")
