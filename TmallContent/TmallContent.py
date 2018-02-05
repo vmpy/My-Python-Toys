@@ -43,18 +43,10 @@ class TmallSpider:
         FileName = "D:\\TmallContent\\" + str(self.itemId) + '\\'
         if not (os.path.exists(FileName)):
             os.makedirs(FileName)
-        else:
-            Tmp = input('已存在该文件记录,是否继续？请输入[继续\\退出]:\n')
-            while Tmp != '继续' and Tmp != '退出':
-                Tmp = input("\n指令有误,请重新输入:")
-
-            if Tmp == '退出':
-                return 0
         os.chdir(FileName)
 
-        
         Index = 0
-        with open(str(self.itemId) + '.txt','a',encoding = 'utf-8') as File:
+        with open('商品序号：' + str(self.itemId) + '.txt','a',encoding = 'utf-8') as File:
             try:
                 File.write("用户:" + self.JsonData[Index]['displayUserNick'] + ':\n')
                 File.write("商品型号:" + self.JsonData[Index]['auctionSku'] + '\n')
@@ -68,17 +60,31 @@ class TmallSpider:
 
         return 0
 
-if __name__ == '__main__':
-    Instance = TmallSpider()
+def IsGoOn():
+    while(1):
+        Tmp = input("\n是否继续?(继续\退出):")
+        while Tmp != '继续' and Tmp != '退出':
+            Tmp = input("\n指令有误,请重新输入:")
 
-    Instance.GetUrl()
-    Instance.ExtrackrInformation()
-    LastPage = Instance.GetContentData(1)
-    Instance.WriteFile
-    print("第1页爬取完毕")
-    Page = 2
-    while(LastPage >= Page):
-        Instance.GetContentData(Page)
-        print("第"+str(Page)+"页爬取完毕")
-        Page += 1
-        time.sleep(3)
+        if Tmp == '继续':
+            return 1
+        if Tmp == '退出':
+            return 0
+
+
+if __name__ == '__main__':
+    while(IsGoOn()):
+        Instance = TmallSpider()
+
+        Instance.GetUrl()
+        Instance.ExtrackrInformation()
+        LastPage = Instance.GetContentData(1)
+        Instance.WriteFile()
+        print("第1页爬取完毕")
+        Page = 2
+        while(LastPage >= Page):
+            Instance.GetContentData(Page)
+            Instance.WriteFile()
+            print("第"+str(Page)+"页爬取完毕")
+            Page += 1
+            time.sleep(3)
