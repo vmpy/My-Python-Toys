@@ -7,7 +7,7 @@ import urllib.request
 
 class TmallSpider:
     def __init__(self):
-        #保证不重复获取self.LastPage
+        #保证不重复获取bool self.LastPage
         self.Count = True
         self.Headers = { 'authority':'rate.tmall.com',
                     'method':'GET',
@@ -59,8 +59,7 @@ class TmallSpider:
             print('请求获取错误!')
             print('正在重新获取!')
             return -1
-        print(beg)
-        print(end)
+        
         Response = Response[beg:end]
         
         self.JsonData = json.loads(Response)
@@ -101,7 +100,9 @@ def IsGoOn():
 
 
 if __name__ == '__main__':
-    while(IsGoOn()):
+    IsFirst = True
+    while(IsGoOn() and IsFirst == True):
+        IsFirst = False
         Instance = TmallSpider()
 
         Instance.GetUrl()
@@ -111,6 +112,7 @@ if __name__ == '__main__':
         print("第1页爬取完毕")
         Page = 2
         while(LastPage >= Page):
+            #有时候Response会为空值，原因未知.只好重新尝试.
             if(Instance.GetContentData(Page) == -1):
                 continue
             Instance.WriteFile()
