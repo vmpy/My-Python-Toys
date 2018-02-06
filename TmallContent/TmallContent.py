@@ -73,18 +73,44 @@ class TmallSpider:
         os.chdir(FileName)
 
         Index = 0
-        with open(self.FileName + '.txt','a',encoding = 'utf-8') as File:
+        while(1):
+            with open(self.FileName + '.txt','a',encoding = 'utf-8') as File:
+                try:
+                    File.write("用户:" + self.JsonData[Index]['displayUserNick'] + ':\n')
+                    File.write("商品型号:" + self.JsonData[Index]['auctionSku'] + '\n')
+                    File.write("评论:" + self.JsonData[Index]['rateContent'] + '\n')
+                    File.write("评论日期:" + self.JsonData[Index]['rateDate'] + '\n')
+                    File.write("卖家回复:" + self.JsonData[Index]['reply'] + '\n\n')
+                    File.close()
+                    self.WirtePics(Index)
+                    Index += 1
+                    
+                except IndexError:
+                    return 0
+        return 0
+    
+    def WirtePics(self,Index):
+        PicIndex = 0
+        if not self.JsonData[Index]['pics'][PicIndex]:
+                    print('单个用户图片下载完毕')
+                    return 0
+        FileName = "D:\\TmallContent\\" + str(self.FileName) + '\\' + self.JsonData[Index]['displayUserNick'].replace('*','') + '\\'
+        if not (os.path.exists(FileName)):
+            os.makedirs(FileName)
+        os.chdir(FileName)
+        while(1):
             try:
-                File.write("用户:" + self.JsonData[Index]['displayUserNick'] + ':\n')
-                File.write("商品型号:" + self.JsonData[Index]['auctionSku'] + '\n')
-                File.write("评论:" + self.JsonData[Index]['rateContent'] + '\n')
-                File.write("评论日期:" + self.JsonData[Index]['rateDate'] + '\n')
-                File.write("卖家回复:" + self.JsonData[Index]['reply'] + '\n\n')
-                File.close()
-                Index += 1
+                with open(str(PicIndex) + '.jpg','wb') as File:
+                    Response = urllib.request.urlopen('http:' + self.JsonData[Index]['pics'][PicIndex])
+                    File.write(Response.read())
+                    File.close()
+                    PicIndex += 1
             except IndexError:
-                return 0 
-
+                #删除因为IndexError跳转于此而JPG是空的,删除文件.
+                os.remove(str(PicIndex) + '.jpg')
+                os.chdir("D:\\TmallContent\\" + str(self.FileName) + '\\')
+                print('单个用户图片下载完毕')
+                return 0
         return 0
 
 def IsGoOn(IsFirst):
