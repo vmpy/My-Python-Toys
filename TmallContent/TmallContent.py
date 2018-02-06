@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import re
 import os
 import json
@@ -49,21 +50,23 @@ class TmallSpider:
         Response = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('GBK')
         #获取最后一页.
         if(self.Count):
-            self.LastPage = int(re.findall(r'"lastPage":([0-9]+)',Response)[0])
-            self.Count = False
+            try:
+                self.LastPage = int(re.findall(r'"lastPage":([0-9]+)',Response)[0])
+                self.Count = False
+            except IndexError:
+                return -1
         #方括号内才是格式正确的json数据.
         #用字符串切片截取
         beg = Response.find('[')
         end = Response.rfind(']')+1
         if (beg == -1 or end == 0):
             print('\n[!提示]请求获取错误!')
-            print('\n[!提示]正在重新获取!')
+            print('[!提示]正在重新获取!')
             return -1
         
-        Response = Response[beg:end]
+        Response = Response[beg:end].replace("'",'"')
         
         self.JsonData = json.loads(Response)
-        
         return self.LastPage
 
     def WriteFile(self):
@@ -74,30 +77,34 @@ class TmallSpider:
 
         Index = 0
         while(1):
-            with open(self.FileName + '.txt','a',encoding = 'utf-8') as File:
-                try:
+            self.WirtePics(Index)
+            try:
+                with open(self.FileName + '.txt','a',encoding = 'utf-8') as File:
                     File.write("用户:" + self.JsonData[Index]['displayUserNick'] + ':\n')
                     File.write("商品型号:" + self.JsonData[Index]['auctionSku'] + '\n')
                     File.write("评论:" + self.JsonData[Index]['rateContent'] + '\n')
                     File.write("评论日期:" + self.JsonData[Index]['rateDate'] + '\n')
                     File.write("卖家回复:" + self.JsonData[Index]['reply'] + '\n\n')
                     File.close()
-                    self.WirtePics(Index)
                     Index += 1
                     
-                except IndexError:
-                    return 0
+            except IndexError:
+                CEF(FileName)
+                return 0
         return 0
     
     def WirtePics(self,Index):
         PicIndex = 0
-        if not self.JsonData[Index]['pics'][PicIndex]:
-                    print('单个用户图片下载完毕')
-                    return 0
-        FileName = "D:\\TmallContent\\" + str(self.FileName) + '\\' + self.JsonData[Index]['displayUserNick'].replace('*','x') + '\\'   #windows系统限制,文件名不可包括'*'
+        
+        try:
+            FileName = "D:\\TmallContent\\" + str(self.FileName) + '\\' + self.JsonData[Index]['displayUserNick'].replace('*','x') + '\\'   #windows系统限制,文件名不可包括'*'
+        except IndexError:
+            return 0
+        
         if not (os.path.exists(FileName)):
             os.makedirs(FileName)
         os.chdir(FileName)
+        
         while(1):
             try:
                 with open(str(PicIndex) + '.jpg','wb') as File:
@@ -109,11 +116,19 @@ class TmallSpider:
                 #删除因为IndexError跳转于此而JPG是空的,删除文件.
                 os.remove(str(PicIndex) + '.jpg')
                 os.chdir("D:\\TmallContent\\" + str(self.FileName) + '\\')
-                print('单个用户图片下载完毕')
                 return 0
         return 0
 
 def IsGoOn(IsFirst):
+    """
+    判断使用者是否要继续.
+    Args:
+        IsFirst:在__main__中判断是否第一次进入.
+    Retruns:
+        1.如果__main__中为第一次进入,返回True
+        2.用户输入继续,返回True
+        3.用户输入退出,返回Flase
+    """
     if(IsFirst):
         return 1
     
@@ -127,6 +142,19 @@ def IsGoOn(IsFirst):
         if Tmp == '退出':
             return 0
 
+def CEF(path):
+    """
+    CLean empty files, 清理空文件夹和空文件
+    Args:
+        path: 文件路径，检查此文件路径下的子文件
+    Returns:
+        None
+    """
+    files = os.listdir(path)  # 获取路径下的子文件(夹)列表
+    for file in files:
+        if os.path.isdir(file):  # 如果是文件夹
+            if not os.listdir(file):  # 如果子文件为空
+                os.rmdir(file)  # 删除这个空文件夹
 
 if __name__ == '__main__':
     IsFirst = True
@@ -137,6 +165,9 @@ if __name__ == '__main__':
         Instance.GetUrl()
         Instance.ExtrackrInformation()
         LastPage = Instance.GetContentData(1)
+        if LastPage == -1:
+            print("[!提示]获取失败!")
+            continue
         Instance.WriteFile()
         print("第1页爬取完毕")
         Page = 2
