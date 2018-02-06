@@ -94,7 +94,7 @@ class TmallSpider:
         if not self.JsonData[Index]['pics'][PicIndex]:
                     print('单个用户图片下载完毕')
                     return 0
-        FileName = "D:\\TmallContent\\" + str(self.FileName) + '\\' + self.JsonData[Index]['displayUserNick'].replace('*','') + '\\'
+        FileName = "D:\\TmallContent\\" + str(self.FileName) + '\\' + self.JsonData[Index]['displayUserNick'].replace('*','x') + '\\'   #windows系统限制,文件名不可包括'*'
         if not (os.path.exists(FileName)):
             os.makedirs(FileName)
         os.chdir(FileName)
