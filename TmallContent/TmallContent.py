@@ -57,7 +57,8 @@ class TmallSpider:
         end = Response.rfind(']')+1
         if (beg == -1 or end == 0):
             print('请求获取错误!')
-            exit()
+            print('正在重新获取!')
+            return -1
         print(beg)
         print(end)
         Response = Response[beg:end]
@@ -110,7 +111,8 @@ if __name__ == '__main__':
         print("第1页爬取完毕")
         Page = 2
         while(LastPage >= Page):
-            Instance.GetContentData(Page)
+            if(Instance.GetContentData(Page) == -1):
+                continue
             Instance.WriteFile()
             print("第"+str(Page)+"页爬取完毕")
             Page += 1
