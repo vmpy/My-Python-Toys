@@ -87,7 +87,10 @@ class TmallSpider:
 
         return 0
 
-def IsGoOn():
+def IsGoOn(IsFirst):
+    if(IsFirst):
+        return 1
+    
     while(1):
         Tmp = input("\n是否继续?(继续\退出):")
         while Tmp != '继续' and Tmp != '退出':
@@ -101,7 +104,7 @@ def IsGoOn():
 
 if __name__ == '__main__':
     IsFirst = True
-    while(IsGoOn() and IsFirst == True):
+    while(IsGoOn(IsFirst)):
         IsFirst = False
         Instance = TmallSpider()
 
