@@ -7,6 +7,18 @@ import time
 import urllib.request
 
 class TmallSpider:
+    """
+    爬取天猫评论和图片的操作集合.
+    Attributes:
+        Count:保证不重复获取bool self.LastPage的记录器.
+        Headers:喜闻乐见.
+        Url:天猫商品页面链接.
+        FileName:天猫商品页面标题作为文件夹名.
+        itemId:获取Json数据的链接中的关键信息.
+        sellerId:获取Json数据的链接中的关键信息.
+        LastPage：评论的最后一页.
+    """
+    
     def __init__(self):
         #保证不重复获取bool self.LastPage
         self.Count = True
