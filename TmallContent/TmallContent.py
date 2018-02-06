@@ -7,6 +7,8 @@ import urllib.request
 
 class TmallSpider:
     def __init__(self):
+        #保证不重复获取self.LastPage
+        self.Count = True
         self.Headers = { 'authority':'rate.tmall.com',
                     'method':'GET',
                     'scheme':'https',
@@ -18,8 +20,19 @@ class TmallSpider:
 
     def GetUrl(self):
         self.Url = input('请输入天猫商品链接:\n')
+        self.GetTitle()
         return 0
-    
+
+    def GetTitle(self):
+        Headers = self.Headers
+        Headers['cache-control'] = 'max-age=0'
+        Request = urllib.request.Request(self.Url,None,Headers,method = 'GET')
+        Response = urllib.request.urlopen(Request)
+        Html = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('GBK')
+
+        self.FileName = re.findall(r'<title>([\s\S]+)</title>',Html)[0]
+        return 0
+        
     def ExtrackrInformation(self):
         #获取链接中的关键信息:itemId,sellerId
         self.itemId = re.findall(r'id=([0-9]+)',self.Url)[0]
@@ -35,20 +48,32 @@ class TmallSpider:
         Response = urllib.request.urlopen(Request)
         Response = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('GBK')
         #获取最后一页.
-        self.LastPage = int(re.findall(r'"lastPage":([0-9]+)',Response)[0])
+        if(self.Count):
+            self.LastPage = int(re.findall(r'"lastPage":([0-9]+)',Response)[0])
+            self.Count = False
         #方括号内才是格式正确的json数据.
-        Response = re.findall(r'"rateList":(\[[\S\s]+\]),"searchinfo":"","tags":""}',Response)[0]
+        #用字符串切片截取
+        beg = Response.find('[')
+        end = Response.rfind(']')+1
+        if (beg == -1 or end == 0):
+            print('请求获取错误!')
+            exit()
+        print(beg)
+        print(end)
+        Response = Response[beg:end]
+        
         self.JsonData = json.loads(Response)
+        
         return self.LastPage
 
     def WriteFile(self):
-        FileName = "D:\\TmallContent\\" + str(self.itemId) + '\\'
+        FileName = "D:\\TmallContent\\" + str(self.FileName) + '\\'
         if not (os.path.exists(FileName)):
             os.makedirs(FileName)
         os.chdir(FileName)
 
         Index = 0
-        with open('商品序号：' + str(self.itemId) + '.txt','a',encoding = 'utf-8') as File:
+        with open(self.FileName + '.txt','a',encoding = 'utf-8') as File:
             try:
                 File.write("用户:" + self.JsonData[Index]['displayUserNick'] + ':\n')
                 File.write("商品型号:" + self.JsonData[Index]['auctionSku'] + '\n')
