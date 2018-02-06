@@ -56,8 +56,8 @@ class TmallSpider:
         beg = Response.find('[')
         end = Response.rfind(']')+1
         if (beg == -1 or end == 0):
-            print('[提示]请求获取错误!')
-            print('[提示]正在重新获取!')
+            print('\n[!提示]请求获取错误!')
+            print('\n[!提示]正在重新获取!')
             return -1
         
         Response = Response[beg:end]
