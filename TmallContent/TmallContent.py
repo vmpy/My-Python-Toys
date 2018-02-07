@@ -32,11 +32,19 @@ class TmallSpider:
                     'user-agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
 
     def GetUrl(self):
+        """
+        获取天猫商品页面链接,保存至属性Url中,并且获取天猫商品页面标题.
+        Returns:None
+        """
         self.Url = input('请输入天猫商品链接:\n')
         self.GetTitle()
-        return 0
+        return None
 
     def GetTitle(self):
+        """
+        获取天猫商品页面标题，用作文件夹名字.
+        Returns:None
+        """
         Headers = self.Headers
         Headers['cache-control'] = 'max-age=0'
         Request = urllib.request.Request(self.Url,None,Headers,method = 'GET')
@@ -44,15 +52,26 @@ class TmallSpider:
         Html = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('GBK')
 
         self.FileName = re.findall(r'<title>([\s\S]+)</title>',Html)[0]
-        return 0
+        return None
         
     def ExtrackrInformation(self):
-        #获取链接中的关键信息:itemId,sellerId
+        """
+        获取链接中的关键信息:itemId,sellerId
+        Returns:None
+        """
         self.itemId = re.findall(r'id=([0-9]+)',self.Url)[0]
         self.sellerId = re.findall(r'user_id=([0-9]+)',self.Url)[0]
-        return 0
+        return None
     
     def GetContentData(self,Page):
+        """
+        获取评论区Json数据.
+        Returns:
+            1.获取失败返回-1.
+            2.获取成功返回LastPage.
+        Args:
+            Page:目标页码.
+        """
         #Target为临时变量，储存目标链接.
         TargetUrl = 'https://rate.tmall.com/list_detail_rate.htm?itemId=' + self.itemId + '&sellerId=' + self.sellerId + '&currentPage=' + str(Page)
         self.Headers['path'] = '/list_detail_rate.htm?itemId=' + self.itemId + '&sellerId=' + self.sellerId + '&currentPage=' + str(Page)
@@ -82,6 +101,10 @@ class TmallSpider:
         return self.LastPage
 
     def WriteFile(self):
+        """
+        将JsonData中的数据写入文件.
+        Returns:None
+        """
         FileName = "D:\\TmallContent\\" + str(self.FileName) + '\\'
         if not (os.path.exists(FileName)):
             os.makedirs(FileName)
@@ -102,16 +125,20 @@ class TmallSpider:
                     
             except IndexError:
                 CEF(FileName)
-                return 0
-        return 0
+                return None
+        return None
     
     def WirtePics(self,Index):
+        """
+        写入评论区所含图片.
+        Returns:None
+        """
         PicIndex = 0
         
         try:
             FileName = "D:\\TmallContent\\" + str(self.FileName) + '\\' + self.JsonData[Index]['displayUserNick'].replace('*','x') + '\\'   #windows系统限制,文件名不可包括'*'
         except IndexError:
-            return 0
+            return None
         
         if not (os.path.exists(FileName)):
             os.makedirs(FileName)
@@ -128,8 +155,8 @@ class TmallSpider:
                 #删除因为IndexError跳转于此而JPG是空的,删除文件.
                 os.remove(str(PicIndex) + '.jpg')
                 os.chdir("D:\\TmallContent\\" + str(self.FileName) + '\\')
-                return 0
-        return 0
+                return None
+        return None
 
 def IsGoOn(IsFirst):
     """
@@ -167,6 +194,7 @@ def CEF(path):
         if os.path.isdir(file):  # 如果是文件夹
             if not os.listdir(file):  # 如果子文件为空
                 os.rmdir(file)  # 删除这个空文件夹
+    return None
 
 if __name__ == '__main__':
     IsFirst = True
