@@ -8,6 +8,11 @@ import re
 import urllib.request
 
 def GetVideoNumber():
+    """
+    获取要爬取视频的AV编号.
+    Returns:
+        Num:视频Av号.
+    """
     Num = input("请输入Bilibili视频Av号(请输入纯数字):\n")
     while re.match(r'[^(avAV0-9)]+',Num):       #如果输入为非纯数字字符串
         Num = input("输入有误,请重新输入Bilibili视频Av号(请输入正确编码):\n")
@@ -27,6 +32,10 @@ def GetVideoNumber():
     return Num
 
 def GetCommentData(Num):  
+    """
+    获取要爬取视频的评论Json数据，使用函数写入数据.
+    Returns:None
+    """
     #是否已经爬取过热评
     IsSaveHots = False
 
@@ -68,9 +77,15 @@ def GetCommentData(Num):
             return 0
         Page += 1
         time.sleep(1)       #防止访问过频，然后GG
-    return 0
+    return None
 
 def SaveHots(Comment):
+    """
+    保存热评信息.
+    Args:
+        Comment:评论区Json数据.
+    Returns:None
+    """
     #json数据的索引
     Index = 0
     while(1):
@@ -85,9 +100,19 @@ def SaveHots(Comment):
                 Index+=1
         except IndexError:
             print('热评爬取完毕!')
-            return 0
+            return None
 
 def SaveNormalReplies(Comment,Page,Num):
+    """
+    保存普通评论区信息.
+    Args:
+        Comment:评论区Json数据.
+        Page:当前Json数据的页码数.
+        Num:视频Av号.
+    Returns:
+        1.如果爬取单页爬取完毕，但楼层Floor非为1，返回0.
+        2.如果楼层Floor为1，证明爬取完毕，返回1.
+    """
     #json数据的索引
     Index = 0
     while(1):
@@ -120,6 +145,14 @@ def SaveNormalReplies(Comment,Page,Num):
             return 0
 
 def SaveNormalRepliesReplies(Comment,Index,Num):
+    """
+    保存评论楼中楼信息.
+    Args:
+        Comment:评论区Json数据.
+        Index:目标楼层数Json数据中索引.
+        Num:视频Av号.
+    Returns:None
+    """
     #楼中楼评论页数.
     PageNum = 1
     Referer = 'https://www.bilibili.com/video/' + 'av' + Num + '/'
@@ -168,6 +201,12 @@ def SaveNormalRepliesReplies(Comment,Index,Num):
     return 0
 
 def IsGoOn():
+    """
+    判断使用者是否要继续.
+    Retruns:
+        2.用户输入继续,返回True
+        3.用户输入退出,返回Flase
+    """
     while(1):
         Tmp = input("\n是否继续?(继续\退出):")
         while Tmp != '继续' and Tmp != '退出':
