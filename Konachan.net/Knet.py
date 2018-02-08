@@ -11,6 +11,10 @@ import urllib.request
 Tag = str()
 
 def GetPicStyleName():
+    """
+    获取K站内罗马音Tags.
+    Returns:PicStyle:罗马音Tag.
+    """
     global Tag
     Tag = PicStyle = str(input("请输入要在K站爬取图片的类型：\n"))
     #HomeUrl = "https://konachan.com/post?tags=" + PicStyle
@@ -31,6 +35,14 @@ def GetPicStyleName():
     return PicStyle
 
 def OpenHomeUrl(Url):
+    """
+    获取Tag相关图片浏览页面.
+    Args:
+        Url:页面链接.
+    Returns:
+        1.所有页面爬取完毕，返回0.
+        2.PicUrlResult:返回一个关于所有图片详细页面的地址.
+    """
     Headers = {'authority':'konachan.com',
                 'method':'GET',
                 'path':'/post?tags='+Tag,
@@ -46,13 +58,17 @@ def OpenHomeUrl(Url):
 
     Response = urllib.request.urlopen(Req)
     Html = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
-    if re.search(r'Nobody here but us chickens!',Html) != None:
+    if re.search(r'Nobody here but us chickens!',Html):
         return 0
     PicUrlResult = re.findall(r'<span class="plid">#pl (https://konachan.com/post/show/[0-9]+)</span>',Html)
 
     return PicUrlResult
 
 def CopyPic(PicResult):
+    """
+    找到图片链接，写入文件.
+    Returns:None
+    """
     count = 0
     for i in PicResult:
         
@@ -94,7 +110,7 @@ def CopyPic(PicResult):
             count = count+1
         print("第" + str(count) + "张"+"下载完成!")
         
-    return 0
+    return None
 
 
 if __name__ == '__main__':
