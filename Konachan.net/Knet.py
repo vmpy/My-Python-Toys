@@ -125,5 +125,5 @@ if __name__ == '__main__':
             SomeThing = (str(Page)).encode('utf-8')
             T.write(SomeThing)
             T.close()
-        
+        print('第' + str(Page) + '页下载完成!')
         time.sleep(1)   #防止访问过频，然后GG
