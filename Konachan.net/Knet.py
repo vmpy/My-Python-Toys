@@ -3,12 +3,16 @@
 import re
 import os
 import time
+import zlib
 import urllib.request
 
 #https://konachan.com/post?tags=data
 
+Tag = str()
+
 def GetPicStyleName():
-    PicStyle = str(input("请输入要在K站爬取图片的类型：\n"))
+    global Tag
+    Tag = PicStyle = str(input("请输入要在K站爬取图片的类型：\n"))
     #HomeUrl = "https://konachan.com/post?tags=" + PicStyle
     #创建文件夹，并将工作目录设置为该文件夹.
     
@@ -27,11 +31,21 @@ def GetPicStyleName():
     return PicStyle
 
 def OpenHomeUrl(Url):
-    Headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
+    Headers = {'authority':'konachan.com',
+                'method':'GET',
+                'path':'/post?tags='+Tag,
+                'scheme':'https',
+                'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'accept-encoding':'gzip, deflate, sdch, br',
+                'accept-language':'zh-CN,zh;q=0.8',
+                'cache-control':'max-age=0',
+                'referer':'https://konachan.com/',
+                'upgrade-insecure-requests':'1',
+                'user-agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
     Req = urllib.request.Request(Url,None,Headers,method = 'GET')
 
     Response = urllib.request.urlopen(Req)
-    Html = Response.read().decode('UTF-8','ignore')
+    Html = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
     if re.search(r'Nobody here but us chickens!',Html) != None:
         return 0
     PicUrlResult = re.findall(r'<span class="plid">#pl (https://konachan.com/post/show/[0-9]+)</span>',Html)
@@ -42,13 +56,21 @@ def CopyPic(PicResult):
     count = 0
     for i in PicResult:
         
-        Headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
+        Headers={'user-agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+                 'authority':'konachan.com',
+                 'method':'GET',
+                 'scheme':'https',
+                 'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                 'accept-encoding':'gzip, deflate, sdch, br',
+                 'accept-language':'zh-CN,zh;q=0.8',
+                 'cache-control':'max-age=0'}
+        
         Req = urllib.request.Request(i,None,Headers,method = 'GET')
 
         Response = urllib.request.urlopen(Req)
-        Html = Response.read().decode('UTF-8','ignore')
+        Html = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
         
-        link = re.search(r'https://konachan.com/sample/[\S]+/Konachan.com[\S]+sample.jpg',Html)
+        link = re.search(r'https://konachan.com/sample/[a-z0-9A-Z]+/Konachan.com[\S]+sample.jpg',Html)
 
         #如果其不存在类似链接,迭代获取下一个
         if not link:
