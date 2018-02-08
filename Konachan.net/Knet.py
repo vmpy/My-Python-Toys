@@ -69,16 +69,17 @@ def CopyPic(PicResult):
 
         Response = urllib.request.urlopen(Req)
         Html = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
-        
-        link = re.findall(r'(https://konachan.com/sample/[a-z0-9A-Z]+/Konachan.com[\S]+sample.jpg)',Html)
+        try:
+            link = re.findall(r'(https://konachan.com/sample/[a-z0-9A-Z]+/Konachan.com[\S]+sample.jpg)',Html)[0]
 
-        #如果其不存在类似链接,迭代获取下一个
-        if not link:
+        #如果其不存在类似链接,是因为源代码使用Js嵌入图片
+        except IndexError:
             link = re.findall(r'(https:\\/\\/konachan.com\\/image\\/[a-z0-9]+\\/Konachan.com[\S]+.jpg)',Html)
-            print(link[0])
-            print(link[0].replace('\\',''))
+            #re贪婪模式会获取许多个相似链接，只取第一个.
+            end = link[0].find('"')
+            link = link[0][0:end]
         
-        link = link[0].replace('\\','')
+        link = link.replace('\\','')
         Response = urllib.request.urlopen(link)
 
         FileName = re.sub(r'%20','&',link.split('/')[-1])
