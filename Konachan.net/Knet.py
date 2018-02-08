@@ -70,13 +70,15 @@ def CopyPic(PicResult):
         Response = urllib.request.urlopen(Req)
         Html = zlib.decompress(Response.read(),16+zlib.MAX_WBITS).decode('utf-8')
         
-        link = re.search(r'https://konachan.com/sample/[a-z0-9A-Z]+/Konachan.com[\S]+sample.jpg',Html)
+        link = re.findall(r'(https://konachan.com/sample/[a-z0-9A-Z]+/Konachan.com[\S]+sample.jpg)',Html)
 
         #如果其不存在类似链接,迭代获取下一个
         if not link:
-            print('pass')
-            continue
-        link = link.group()
+            link = re.findall(r'(https:\\/\\/konachan.com\\/image\\/[a-z0-9]+\\/Konachan.com[\S]+.jpg)',Html)
+            print(link[0])
+            print(link[0].replace('\\',''))
+        
+        link = link[0].replace('\\','')
         Response = urllib.request.urlopen(link)
 
         FileName = re.sub(r'%20','&',link.split('/')[-1])
