@@ -28,7 +28,7 @@ def OpenUrl():
         except urllib.error.URLError as err:
             return 0
             
-        html = response.read().decode('gb2312','ignore')
+        html = response.read().decode('gb2312','ignore')	#没办法，小网站编码乱搞.
         NextUrl = re.findall(r'下一篇：<a href=\'([0-9\w/_]*.html)\'>',html)
 	if not NextUrl:
 		print('下载完毕\n')
