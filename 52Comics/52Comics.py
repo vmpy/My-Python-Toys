@@ -17,7 +17,7 @@ def OpenPage(PageList):
         response = urllib.request.urlopen(OpenUrl)
         html = response.read().decode('gb2312','ignore')
         OpenImgine(html,False)
-    return 0
+    return 0#返回无用值，不用在意
 
 def OpenUrl():
     #http://www.*****.org/*****/********/*.html
