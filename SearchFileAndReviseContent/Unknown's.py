@@ -33,12 +33,18 @@ def EnterPathAndDoSth(Path):
         print('当前文件(夹)' + TmpFileName)
         if os.path.isfile(TmpFileName):     #判断正在处理的路径是否为文件.
             if CheckFileExtensionFilename(TmpFileName):     #判断该文件的后缀名是不是我们想要的查找的文件，如果是，继续，或者继续循环.
-                File = open(TmpFileName,'r+',encoding = 'utf-8')   #打开文件，文本读写模式，utf-8解码.
-                string = File.read()    #读取文件.
-                string = string.replace(KeyWord,TargetWord)     #替换文件内容字符串.
-                File.seek(0)    #因为读取文件会吧文件指针指向文件尾EOF，所以要重新设置.
-                File.write(string)      #写入字符串.
-                File.close()
+                File = open(TmpFileName,'rb')   #打开文件，文本读写模式，utf-8解码.
+                string = File.read().decode('utf-8','ignore')    #读取文件.
+                if KeyWord in string:
+                    string = string.replace(KeyWord,TargetWord)     #替换文件内容字符串.
+                    File.close()
+                    
+                    File = open(TmpFileName,'wb')
+                    File.write(string.encode('utf-8'))      #写入字符串.
+                    File.close()
+                else:
+                    File.close()
+                    continue
             else:
                 continue
         else:
