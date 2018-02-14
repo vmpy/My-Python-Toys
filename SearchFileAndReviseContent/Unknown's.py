@@ -1,4 +1,5 @@
-#coding = utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import os
 import re
 
@@ -42,6 +43,7 @@ def EnterPathAndDoSth(Path):
                 continue
 
 def CheckFileExtensionFilename(Name):
+    #You can revise this piece of code to Search other kinds file.
     if re.findall(r'(\S+.txt)',Name):
         return True
     else:
