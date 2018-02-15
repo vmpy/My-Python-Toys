@@ -3,6 +3,7 @@
 import os
 import re   #正则表达式库.
 
+#遍历盘符查找文件...
 KeyWord = str()     #查找的关键字.
 TargetWord = str()  #替换的字符串
 TargetPath = str()  #目标盘符.
